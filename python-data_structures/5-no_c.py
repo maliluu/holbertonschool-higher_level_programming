@@ -1,0 +1,1 @@
+#!/usr/bin/python3def no_c(my_string):    element = ''    for i in range(len(my_string)):        element = my_string[i]        if element == 'c':            my_string.remove(element)        if element == 'C':            my_string.remove(element)
