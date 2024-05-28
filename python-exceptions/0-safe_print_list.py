@@ -1,1 +1,1 @@
-#!/usr/bin/python3def safe_print_list(my_list=[], x=0):    counter = 0    for i in range(x):        try:            print("{}".format(my_list[i]), end="")        except:            break        else:            counter += 1    print() # Prints a newline    return counter
+#!/usr/bin/python3def safe_print_list(my_list=[], x=0):    counter = 0    for i in range(x):        try:            print("{}".format(my_list[i]), end="")        except:            break        else:            counter += 1    print()    return counter
