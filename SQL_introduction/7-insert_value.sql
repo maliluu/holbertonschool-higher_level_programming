@@ -1,7 +1,3 @@
--- Script inserts rows in database
+-- Inserts new row into `first_table`, DB passed as script arg.
 INSERT INTO first_table (id, name)
-VALUES (89, 'Best School')-- Script displays number of records with id == 89
-SELECT count(*)
-AS record_count
-FROM first_table
-WHERE id = 89;
+       VALUES (89, 'Holberton School');
