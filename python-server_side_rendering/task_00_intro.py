@@ -1,64 +1,81 @@
 #!/usr/bin/python3
-import os
-"""Program defines function that generates personalized invitation files
+
+"""
+This module contains a function that generates personalized invitation
+files from a template with placeholders and a list of objects. Each output
+file should be named sequentially, starting from 1. It also contains
+specific error handling for various edge cases.
 """
 
+import os
+
 def generate_invitations(template, attendees):
-    """Function generates invitations
-
-    Args:
-        template (str)
-        attendees (list)
-
-    Returns:
-        _type_: _description_
     """
-
-    if not isinstance(template, str) or template is None: 
-        print("Template is supposed to be a string")
-        return
+    Generates personalized invitations from a template and a list of attendees.
     
-    if not isinstance(attendees, list) or attendees is None:
-        print("Attendees is supposed to be a list")
+    Parameters:
+    - template (str): The template string with placeholders.
+    - attendees (list): A list of dictionaries, each containing details of an attendee.
+    
+    Returns:
+    None
+    """
+    
+    if not isinstance(template, str):
+        print("Error: Template must be a string.")
         return
 
+    if not isinstance(attendees, list) or not all(isinstance(attendee, dict) for attendee in attendees):
+        print("Error: Attendees must be a list of dictionaries.")
+        return
+
+    """ Handle empty inputs """
     if not template:
         print("Template is empty, no output files generated.")
         return
-    
+
     if not attendees:
         print("No data provided, no output files generated.")
         return
-    
-    
-    try:
-        for x, attendee in enumerate(attendees, start=1):
-            attendee_name = attendee.get("name") or "N/A"
-            attendee_title = attendee.get("event_title") or "N/A"
-            attendee_date = attendee.get("event_date") or "N/A"
-            attendee_location = attendee.get("event_location") or "N/A"
 
+    """ Process each attendee """
+    for index, attendee in enumerate(attendees, start=1):
+        """ Copy attendee data to avoid modifying the original dictionary """
+        attendee = attendee.copy()
 
-            replace_name = "{name}"
-            replace_title = "{event_title}"
-            replace_date = "{event_date}"
-            replace_location = "{event_location}"
+        """ Check and replace missing data """
+        for key in ['name', 'event_title', 'event_date', 'event_location']:
+            if key not in attendee or attendee[key] is None:
+                print(f"Warning: Replacing missing data '{key}' with 'N/A'.")
+                attendee[key] = "N/A"
 
-            replace_text = template.replace(replace_name, attendee_name).replace(replace_title, attendee_title).replace(replace_date, attendee_date).replace(replace_location, attendee_location)
-            current_file = f"output_{x}.txt"
+        """ Replace placeholders in the template """
+        try:
+            invitation = template.format(**attendee)
+        except KeyError as e:
+            print(f"Warning: Unexpected missing data {e}")
+            attendee[str(e)] = "N/A"
+            invitation = template.format(**attendee)
 
-            if os.path.exists(current_file):
-                print(f"{current_file} already exists")
-                continue
-            
-            with open(current_file, 'w') as output:
-                output.write(replace_text)
+        """ Write to file """
+        output_file = f"output_{index}.txt"
+        with open(output_file, "w") as file:
+            file.write(invitation)
 
-    except Exception as e:
-        print(f"{e} found")
-        return
+    print("Invitation files generated successfully.")
 
+""" Example usage """
+if __name__ == "__main__":
+    """ Read the template from a file """
+    with open('template.txt', 'r') as file:
+        template_content = file.read()
 
-        
+    """ List of attendees """
+    attendees = [
+        {"name": "Alice", "event_title": "Python Conference", "event_date": "2023-07-15", "event_location": "New York"},
+        {"name": "Bob", "event_title": "Data Science Workshop", "event_date": "2023-08-20", "event_location": "San Francisco"},
+        {"name": "Charlie", "event_title": "AI Summit", "event_date": None, "event_location": "Boston"}
+    ]
 
-
+    """ Call the function with the template and attendees list """
+    generate_invitations(template_content, attendees)
